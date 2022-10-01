@@ -59,6 +59,7 @@ class ViewController: UIViewController {
     @IBAction func tapAddDoubleZeroToEntry(_ sender: UIButton) {
         addToEntry(element: "00")
     }
+    
     @IBAction func tapAddZeroToEntry(_ sender: UIButton) {
         addToEntry(element: "0")
     }
