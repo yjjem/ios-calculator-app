@@ -36,8 +36,11 @@ class ViewController: UIViewController {
     @IBOutlet weak var addButton: UIButton!
     @IBOutlet weak var calculateButton: UIButton!
     
+    var userRawInput: String = ""
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        userRawInput = ""
     }
     
     func addToEntry(element: String) {
@@ -46,16 +49,37 @@ class ViewController: UIViewController {
             guard displayEntryLabel.text != "0" else { return }
             displayEntryLabel.text? += element
         case "1","2","3","4","5","6","7","8","9":
+            guard displayEntryLabel.text != "0" else {
+                displayEntryLabel.text? = element
+                return
+            }
             displayEntryLabel.text? += element
-        //change default value later
         case ".":
             guard displayEntryLabel.text?.contains(".") != true else { return }
             displayEntryLabel.text? += element
         default:
-            print("Wrong Entry Element")
+            displayEntryLabel.text? = "Error"
         }
     }
-
+    
+    func collectUserIput() {
+        guard let signValue = displaySignLabel.text,
+                let entryValue = displayEntryLabel.text else { return }
+        guard entryValue != "0" else { return }
+        userRawInput += "/" + signValue + "/" + entryValue
+        ClearEntry()
+    }
+    
+    func ClearEntry() {
+        displaySignLabel.text = ""
+        displayEntryLabel.text = "0"
+    }
+    
+    func ClearAll() {
+        userRawInput = ""
+        ClearEntry()
+    }
+    
     @IBAction func tapAddDoubleZeroToEntry(_ sender: UIButton) {
         addToEntry(element: "00")
     }
@@ -104,5 +128,35 @@ class ViewController: UIViewController {
         addToEntry(element: ".")
     }
     
+    @IBAction func tapDivisionButton(_ sender: UIButton) {
+        collectUserIput()
+        displaySignLabel.text = String(Operator.divide.rawValue)
+    }
+    
+    @IBAction func tapMultiplyButton(_ sender: UIButton) {
+        collectUserIput()
+        displaySignLabel.text = String(Operator.multiply.rawValue)
+    }
+    
+    @IBAction func tapSubstractButton(_ sender: UIButton) {
+        collectUserIput()
+        displaySignLabel.text = String(Operator.subtract.rawValue)
+    }
+    
+    @IBAction func tapAddButton(_ sender: UIButton) {
+        collectUserIput()
+        displaySignLabel.text = String(Operator.add.rawValue)
+    }
+    
+    @IBAction func tapCalculateButton(_ sender: UIButton) {
+        collectUserIput()
+        print(userRawInput)
+        var formula = ExpresionParser.parse(from: userRawInput)
+        let result = formula.result()
+        print(result)
+        guard let result = result else { return }
+        ClearAll()
+        displayEntryLabel.text? = String(result)
+    }
 }
 

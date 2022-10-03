@@ -20,9 +20,8 @@ class CalculatorTesting: XCTestCase {
     
     func test_queue_append_firstElement_isSucessfull() {
         sut.enqueue(data: 10)
-        
-        XCTAssertEqual(sut.head?.value, 10)
-        XCTAssertNil(sut.head?.next)
+        let result = sut.dequeue()
+        XCTAssertEqual(result, 10)
     }
     
     func test_queue_after_appending_secondElement_FirstNode_next_equal_to_nextNode() {
@@ -30,7 +29,7 @@ class CalculatorTesting: XCTestCase {
         sut.enqueue(data: 30)
         sut.enqueue(data: 40)
         
-        XCTAssertNotNil(sut.head?.next)
+        XCTAssertEqual(sut.read()?.next?.value, 30)
     }
     
     func test_queue_getFirst_returns_head_sucessfully() {
@@ -43,15 +42,14 @@ class CalculatorTesting: XCTestCase {
         XCTAssertEqual(sut.dequeue(), 20)
     }
     
-    func test_queue_after_removeAll_head_and_tail_returns_nil() {
+    func test_queue_after_removeAll_head_returns_nil() {
         sut.enqueue(data: 20)
         sut.enqueue(data: 30)
         sut.enqueue(data: 40)
         
         sut.removeAll()
         
-        XCTAssertNil(sut.head)
-        XCTAssertNil(sut.tail)
+        XCTAssertNil(sut.read())
     }
     
     func test_String_split_works_nice() {
@@ -80,7 +78,7 @@ class CalculatorTesting: XCTestCase {
             sut.enqueue(data: Double(i))
         }
         
-        while sut.head?.next != nil {
+        while sut.read()?.next != nil {
             guard let deq = sut.dequeue() else { return }
             dequeueResult.append(deq as Double)
         }
