@@ -7,8 +7,6 @@
 import UIKit
 
 class ViewController: UIViewController {
-
-    
     
     @IBOutlet weak var displaySignLabel: UILabel!
     @IBOutlet weak var displayEntryLabel: UILabel!
@@ -36,11 +34,38 @@ class ViewController: UIViewController {
     @IBOutlet weak var addButton: UIButton!
     @IBOutlet weak var calculateButton: UIButton!
     
+    @IBOutlet weak var EntryStackView: UIStackView!
     var userRawInput: String = ""
     
     override func viewDidLoad() {
         super.viewDidLoad()
         userRawInput = ""
+    }
+    
+    func collectUserIput() {
+        guard let signValue = displaySignLabel.text,
+                let entryValue = displayEntryLabel.text else { return }
+        guard entryValue != "0" else { return }
+        userRawInput += "/" + signValue + "/" + entryValue
+        clearEntry()
+    }
+    
+    func changeSign(by sender: UIButton) {
+        guard displayEntryLabel.text != "0" else { return }
+        collectUserIput()
+        
+        switch sender {
+        case divideButton:
+            displaySignLabel.text = String(Operator.divide.rawValue)
+        case multiplyButton:
+            displaySignLabel.text = String(Operator.multiply.rawValue)
+        case substractButton:
+            displaySignLabel.text = String(Operator.subtract.rawValue)
+        case addButton:
+            displaySignLabel.text = String(Operator.add.rawValue)
+        default:
+            print("Error while changing sign")
+        }
     }
     
     func addToEntry(element: String) {
@@ -62,14 +87,6 @@ class ViewController: UIViewController {
         }
     }
     
-    func collectUserIput() {
-        guard let signValue = displaySignLabel.text,
-                let entryValue = displayEntryLabel.text else { return }
-        guard entryValue != "0" else { return }
-        userRawInput += "/" + signValue + "/" + entryValue
-        clearEntry()
-    }
-    
     func clearEntry() {
         displaySignLabel.text = ""
         displayEntryLabel.text = "0"
@@ -80,79 +97,85 @@ class ViewController: UIViewController {
         clearEntry()
     }
     
+    @IBAction func tapClearEntry(_ sender: Any) {
+        clearEntry()
+    }
+    
+    @IBAction func tapClearAll(_ sender: Any) {
+        clearAll()
+    }
+    
     @IBAction func tapAddDoubleZeroToEntry(_ sender: UIButton) {
-        addToEntry(element: "00")
+        addToEntry(element: MathElements.doubleZero.rawValue)
     }
     
     @IBAction func tapAddZeroToEntry(_ sender: UIButton) {
-        addToEntry(element: "0")
+        addToEntry(element: MathElements.zero.rawValue)
     }
     
     @IBAction func tapAddOneToEntry(_ sender: UIButton) {
-        addToEntry(element: "1")
+        addToEntry(element: MathElements.one.rawValue)
     }
     
     @IBAction func tapAddTwoToEntry(_ sender: UIButton) {
-        addToEntry(element: "2")
+        addToEntry(element: MathElements.two.rawValue)
     }
     
     @IBAction func tapAddThreeToEntry(_ sender: UIButton) {
-        addToEntry(element: "3")
+        addToEntry(element: MathElements.three.rawValue)
     }
     
     @IBAction func tapAddFourToEntry(_ sender: UIButton) {
-        addToEntry(element: "4")
+        addToEntry(element: MathElements.four.rawValue)
     }
     
     @IBAction func tapAddFiveToEntry(_ sender: UIButton) {
-        addToEntry(element: "5")
+        addToEntry(element: MathElements.five.rawValue)
     }
     
     @IBAction func tapAddSixToEntry(_ sender: UIButton) {
-        addToEntry(element: "6")
+        addToEntry(element: MathElements.six.rawValue)
     }
     
     @IBAction func tapAddSevenToEntry(_ sender: UIButton) {
-        addToEntry(element: "7")
+        addToEntry(element: MathElements.seven.rawValue)
     }
     
     @IBAction func tapAddEightToEntry(_ sender: UIButton) {
-        addToEntry(element: "8")
+        addToEntry(element: MathElements.eight.rawValue)
     }
     
     @IBAction func tapAddNineToEntry(_ sender: UIButton) {
-        addToEntry(element: "9")
+        addToEntry(element: MathElements.nine.rawValue)
     }
     
     @IBAction func tapAddDotToEntry(_ sender: UIButton) {
-        addToEntry(element: ".")
+        addToEntry(element: MathElements.dot.rawValue)
     }
     
     @IBAction func tapDivisionButton(_ sender: UIButton) {
-        collectUserIput()
-        displaySignLabel.text = String(Operator.divide.rawValue)
+        changeSign(by: sender)
     }
     
     @IBAction func tapMultiplyButton(_ sender: UIButton) {
-        collectUserIput()
-        displaySignLabel.text = String(Operator.multiply.rawValue)
+        changeSign(by: sender)
     }
     
     @IBAction func tapSubstractButton(_ sender: UIButton) {
-        collectUserIput()
-        displaySignLabel.text = String(Operator.subtract.rawValue)
+        changeSign(by: sender)
     }
     
     @IBAction func tapAddButton(_ sender: UIButton) {
-        collectUserIput()
-        displaySignLabel.text = String(Operator.add.rawValue)
+        changeSign(by: sender)
     }
     
     @IBAction func tapCalculateButton(_ sender: UIButton) {
         collectUserIput()
+        //delete later
         print(userRawInput)
         var formula = ExpresionParser.parse(from: userRawInput)
         let result = formula.result()
+        //delete later
         print(result)
         guard let result = result else { return }
         clearAll()
