@@ -67,17 +67,17 @@ class ViewController: UIViewController {
                 let entryValue = displayEntryLabel.text else { return }
         guard entryValue != "0" else { return }
         userRawInput += "/" + signValue + "/" + entryValue
-        ClearEntry()
+        clearEntry()
     }
     
-    func ClearEntry() {
+    func clearEntry() {
         displaySignLabel.text = ""
         displayEntryLabel.text = "0"
     }
     
-    func ClearAll() {
+    func clearAll() {
         userRawInput = ""
-        ClearEntry()
+        clearEntry()
     }
     
     @IBAction func tapAddDoubleZeroToEntry(_ sender: UIButton) {
@@ -155,7 +155,7 @@ class ViewController: UIViewController {
         let result = formula.result()
         print(result)
         guard let result = result else { return }
-        ClearAll()
+        clearAll()
         displayEntryLabel.text? = String(result)
     }
 }
