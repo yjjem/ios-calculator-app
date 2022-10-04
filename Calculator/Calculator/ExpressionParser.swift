@@ -14,7 +14,6 @@ enum ExpresionParser {
         
         let operatorCases = Operator.allCases.map { String($0.rawValue) }
         let operators = componenets.filter { operatorCases.contains($0) }
-        print("operation", operators)
         operators.forEach{
             guard let operatorItem = Operator(rawValue: Character($0)) else { return }
             formula.operators.enqueue(data: operatorItem)
@@ -23,7 +22,6 @@ enum ExpresionParser {
         let operands = componenets.filter { value -> Bool in
             !operators.contains(value)
         }
-        print("number", operands)
         operands.forEach{
             guard let doubleItem = Double($0) else { return }
             formula.operands.enqueue(data: doubleItem)
