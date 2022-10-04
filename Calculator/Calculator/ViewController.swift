@@ -34,24 +34,39 @@ class ViewController: UIViewController {
     @IBOutlet weak var addButton: UIButton!
     @IBOutlet weak var calculateButton: UIButton!
     
+    @IBOutlet weak var InputScrollView: UIScrollView!
     @IBOutlet weak var EntryStackView: UIStackView!
     var userRawInput: String = ""
+    var userEntry: String = ""
+    
+    var formatter = NumberFormatter()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         userRawInput = ""
+        userEntry = "0"
+        InputScrollView.showsVerticalScrollIndicator = false
+        configureFormatter()
+        
+        EntryStackView.spacing = 8
+    }
+    
+    func configureFormatter() {
+        formatter.maximumIntegerDigits = 20
+        formatter.maximumFractionDigits = 20
+        formatter.numberStyle = .decimal
     }
     
     func collectUserIput() {
-        guard let signValue = displaySignLabel.text,
-                let entryValue = displayEntryLabel.text else { return }
-        guard entryValue != "0" else { return }
-        userRawInput += "/" + signValue + "/" + entryValue
+        guard let signValue = displaySignLabel.text else { return }
+        guard userEntry != "0" else { return }
+        userRawInput += "/" + signValue + "/" + userEntry
         clearEntry()
     }
     
-    func changeSign(by sender: UIButton) {
+    func addOperator(by sender: UIButton) {
         guard displayEntryLabel.text != "0" else { return }
+        addSubviewToStack(operatorData: displaySignLabel.text, operandData: userEntry)
         collectUserIput()
         
         switch sender {
@@ -68,28 +83,37 @@ class ViewController: UIViewController {
         }
     }
     
-    func addToEntry(element: String) {
+    func setEntryLabel(with input: String) {
+        guard let number = formatter.number(from: input) else { return }
+        let formattedNumber = formatter.string(from: number)
+        displayEntryLabel.text = formattedNumber
+    }
+    
+    func addToEntry(element: MathElements) {
+        
         switch element {
-        case "0","00":
+        case .zero, .doubleZero:
             guard displayEntryLabel.text != "0" else { return }
-            displayEntryLabel.text? += element
-        case "1","2","3","4","5","6","7","8","9":
-            guard displayEntryLabel.text != "0" else {
-                displayEntryLabel.text? = element
-                return
-            }
-            displayEntryLabel.text? += element
-        case ".":
-            guard displayEntryLabel.text?.contains(".") != true else { return }
-            displayEntryLabel.text? += element
-        default:
-            displayEntryLabel.text? = "Error"
+            userEntry += element.rawValue
+            print("Entry:", userEntry)
+            setEntryLabel(with: userEntry)
+        case .one, .two, .three, .four, .five, .six, .seven, .eight, .nine:
+            guard displayEntryLabel.text == "0", displayEntryLabel.text?.count == 20 else {
+                userEntry += element.rawValue
+                print("Entry:", userEntry)
+                setEntryLabel(with: userEntry)
+                return }
+        case .dot:
+            guard displayEntryLabel.text?.contains(element.rawValue) != true else { return }
+            userEntry  += element.rawValue
+            print("Entry:", userEntry)
+            setEntryLabel(with: userEntry)
         }
     }
     
     func clearEntry() {
-        displaySignLabel.text = ""
         displayEntryLabel.text = "0"
+        userEntry = ""
     }
     
     func clearAll() {
@@ -97,79 +121,128 @@ class ViewController: UIViewController {
         clearEntry()
     }
     
-    @IBAction func tapClearEntry(_ sender: Any) {
+    func addSubviewToStack(operatorData: String?, operandData: String) {
+        let operatorLabel: UILabel = makeLabel(from: operatorData ?? "")
+        let operandLabel: UILabel  = makeLabel(from: operandData)
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.spacing = 8
+        stackView.alignment = .fill
+        stackView.addArrangedSubview(operatorLabel)
+        stackView.addArrangedSubview(operandLabel)
+
+        EntryStackView.addArrangedSubview(stackView)
+        moveToBottom()
+        print(EntryStackView.arrangedSubviews.count)
+    }
+    
+    func moveToBottom() {
+        InputScrollView.layoutIfNeeded()
+        let bottomOffset = CGPoint(x: 0, y: InputScrollView.contentSize.height - InputScrollView.bounds.height)
+        InputScrollView.setContentOffset(bottomOffset, animated: true)
+    }
+    
+    func makeLabel(from data: String) -> UILabel {
+        let label = UILabel()
+        label.text = data
+        label.textColor = .white
+        
+        return label
+    }
+    
+    @IBAction func tapChangeNumberSign(_ sender: UIButton) {
+        if userEntry.contains(Operator.subtract.rawValue) {
+            userEntry.removeFirst()
+            displayEntryLabel.text = userEntry
+        } else {
+            userEntry.insert(Operator.subtract.rawValue, at: userEntry.startIndex)
+            displayEntryLabel.text = userEntry
+        }
+    }
+    
+    @IBAction func tapClearEntry(_ sender: UIButton) {
         clearEntry()
     }
     
-    @IBAction func tapClearAll(_ sender: Any) {
+    @IBAction func tapClearAll(_ sender: UIButton) {
+        for view in EntryStackView.arrangedSubviews {
+            view.removeFromSuperview()
+//            EntryStackView.removeArrangedSubview(view)
+        }
         clearAll()
+        print("ClearAll")
     }
     
     @IBAction func tapAddDoubleZeroToEntry(_ sender: UIButton) {
-        addToEntry(element: MathElements.doubleZero.rawValue)
+        addToEntry(element: .doubleZero)
     }
     
     @IBAction func tapAddZeroToEntry(_ sender: UIButton) {
-        addToEntry(element: MathElements.zero.rawValue)
+        addToEntry(element: .zero)
     }
     
     @IBAction func tapAddOneToEntry(_ sender: UIButton) {
-        addToEntry(element: MathElements.one.rawValue)
+        addToEntry(element: .one)
     }
     
     @IBAction func tapAddTwoToEntry(_ sender: UIButton) {
-        addToEntry(element: MathElements.two.rawValue)
+        addToEntry(element: .two)
     }
     
     @IBAction func tapAddThreeToEntry(_ sender: UIButton) {
-        addToEntry(element: MathElements.three.rawValue)
+        addToEntry(element: .three)
     }
     
     @IBAction func tapAddFourToEntry(_ sender: UIButton) {
-        addToEntry(element: MathElements.four.rawValue)
+        addToEntry(element: .four)
     }
     
     @IBAction func tapAddFiveToEntry(_ sender: UIButton) {
-        addToEntry(element: MathElements.five.rawValue)
+        addToEntry(element: .five)
     }
     
     @IBAction func tapAddSixToEntry(_ sender: UIButton) {
-        addToEntry(element: MathElements.six.rawValue)
+        addToEntry(element: .six)
     }
     
     @IBAction func tapAddSevenToEntry(_ sender: UIButton) {
-        addToEntry(element: MathElements.seven.rawValue)
+        addToEntry(element: .seven)
     }
     
     @IBAction func tapAddEightToEntry(_ sender: UIButton) {
-        addToEntry(element: MathElements.eight.rawValue)
+        addToEntry(element: .eight)
     }
     
     @IBAction func tapAddNineToEntry(_ sender: UIButton) {
-        addToEntry(element: MathElements.nine.rawValue)
+        addToEntry(element: .nine)
     }
     
     @IBAction func tapAddDotToEntry(_ sender: UIButton) {
-        addToEntry(element: MathElements.dot.rawValue)
+        addToEntry(element: .dot)
     }
     
     @IBAction func tapDivisionButton(_ sender: UIButton) {
-        changeSign(by: sender)
+        addOperator(by: sender)
+//        addSubviewToStack(operatorData: displaySignLabel.text, operandData: userEntry)
+        
     }
     
     @IBAction func tapMultiplyButton(_ sender: UIButton) {
-        changeSign(by: sender)
+        addOperator(by: sender)
+//        addSubviewToStack(operatorData: displaySignLabel.text, operandData: userEntry)
     }
     
     @IBAction func tapSubstractButton(_ sender: UIButton) {
-        changeSign(by: sender)
+        addOperator(by: sender)
+//        addSubviewToStack(operatorData: displaySignLabel.text, operandData: userEntry)
     }
     
     @IBAction func tapAddButton(_ sender: UIButton) {
-        changeSign(by: sender)
+        addOperator(by: sender)
     }
     
     @IBAction func tapCalculateButton(_ sender: UIButton) {
+        guard userRawInput.isEmpty != true else { return }
         collectUserIput()
         //delete later
         print(userRawInput)
@@ -179,7 +252,7 @@ class ViewController: UIViewController {
         print(result)
         guard let result = result else { return }
         clearAll()
-        displayEntryLabel.text? = String(result)
+        displayEntryLabel.text =  formatter.string(from: NSNumber(value: result))
     }
 }
 
