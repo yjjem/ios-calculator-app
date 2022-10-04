@@ -16,12 +16,17 @@ final class Node<Element: CalculateItem> {
 }
 
 struct CalculatorItemQueue<Element: CalculateItem> {
-    private(set) var head: Node<Element>?
-    private(set) var tail: Node<Element>?
+    private var head: Node<Element>?
+    private var tail: Node<Element>?
     
     init(head: Node<Element>? = nil) {
         self.head = head
         self.tail = head
+    }
+    
+    func read() -> Node<Element>? {
+        guard let result = head else { return nil }
+        return result
     }
     
     mutating func enqueue(data: Element) {
