@@ -11,21 +11,15 @@ enum ExpresionParser {
     static func parse(from input: String) -> Formula {
         let componenets = componentsByOperators(from: input)
         var formula = Formula()
-        
         let operatorCases = Operator.allCases.map { String($0.rawValue) }
-        let operators = componenets.filter { operatorCases.contains($0) }
-        operators.forEach{
-            guard let operatorItem = Operator(rawValue: Character($0)) else { return }
-            formula.operators.enqueue(data: operatorItem)
-        }
         
-        let operands = componenets.filter { value -> Bool in
-            !operators.contains(value)
-        }
-        operands.forEach{
-            guard let doubleItem = Double($0) else { return }
-            formula.operands.enqueue(data: doubleItem)
-        }
+        let operators = componenets.filter { operatorCases.contains($0) }
+                                .compactMap { Operator(rawValue: Character($0)) }
+        operators.forEach { formula.operators.enqueue(data: $0) }
+        
+        let operands = componenets.filter { !operatorCases.contains($0) }
+                                .compactMap { Double($0) }
+        operands.forEach { formula.operands.enqueue(data: $0) }
         
         return formula
     }

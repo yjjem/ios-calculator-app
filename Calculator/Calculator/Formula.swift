@@ -13,8 +13,8 @@ struct Formula {
         guard let firstOperand = operands.dequeue() else { return nil }
         var calculateResult: Double = firstOperand
         
-        while operators.read() != nil {
-            guard let operation = operators.dequeue(), let rhs = operands.dequeue() else { return nil }
+        while let operation = operators.dequeue(),
+              let rhs = operands.dequeue() {
             calculateResult = operation.calculate(lhs: calculateResult, rhs: rhs)
         }
         

@@ -47,7 +47,6 @@ class ViewController: UIViewController {
         userEntry = "0"
         InputScrollView.showsVerticalScrollIndicator = false
         configureFormatter()
-        
         EntryStackView.spacing = 8
     }
     
@@ -61,7 +60,9 @@ class ViewController: UIViewController {
         guard let signValue = displaySignLabel.text else { return }
         guard userEntry != "0" else { return }
         userRawInput += "/" + signValue + "/" + userEntry
-        clearEntry()
+        tapClearEntry()
+        CFGetRetainCount(Node(value: 10))
+        CFGetRetainCount(Node(value: "Hello"))
     }
     
     func addOperator(by sender: UIButton) {
@@ -111,16 +112,6 @@ class ViewController: UIViewController {
         }
     }
     
-    func clearEntry() {
-        displayEntryLabel.text = "0"
-        userEntry = ""
-    }
-    
-    func clearAll() {
-        userRawInput = ""
-        clearEntry()
-    }
-    
     func addSubviewToStack(operatorData: String?, operandData: String) {
         let operatorLabel: UILabel = makeLabel(from: operatorData ?? "")
         let operandLabel: UILabel  = makeLabel(from: operandData)
@@ -160,16 +151,19 @@ class ViewController: UIViewController {
         }
     }
     
-    @IBAction func tapClearEntry(_ sender: UIButton) {
-        clearEntry()
+    @IBAction func tapClearEntry() {
+        displayEntryLabel.text = "0"
+        userEntry = ""
     }
     
-    @IBAction func tapClearAll(_ sender: UIButton) {
+    @IBAction func tapClearAll() {
         for view in EntryStackView.arrangedSubviews {
             view.removeFromSuperview()
 //            EntryStackView.removeArrangedSubview(view)
         }
-        clearAll()
+        displayEntryLabel.text = "0"
+        userEntry = ""
+        userRawInput = ""
         print("ClearAll")
     }
     
@@ -224,7 +218,6 @@ class ViewController: UIViewController {
     @IBAction func tapDivisionButton(_ sender: UIButton) {
         addOperator(by: sender)
 //        addSubviewToStack(operatorData: displaySignLabel.text, operandData: userEntry)
-        
     }
     
     @IBAction func tapMultiplyButton(_ sender: UIButton) {
@@ -251,7 +244,7 @@ class ViewController: UIViewController {
         //delete later
         print(result)
         guard let result = result else { return }
-        clearAll()
+        tapClearAll()
         displayEntryLabel.text =  formatter.string(from: NSNumber(value: result))
     }
 }

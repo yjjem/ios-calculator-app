@@ -5,6 +5,8 @@
 //  Created by Jeremy on 2022/09/20.
 //
 
+import CoreFoundation
+
 final class Node<Element: CalculateItem> {
     var value: Element
     var next: Node?
@@ -22,6 +24,7 @@ struct CalculatorItemQueue<Element: CalculateItem> {
     init(head: Node<Element>? = nil) {
         self.head = head
         self.tail = head
+        CFGetRetainCount(head)
     }
     
     func read() -> Node<Element>? {
